@@ -3,90 +3,120 @@
 ***/
 
 #include "particle.h"
+#include <QRandomGenerator>
 
-Particle::Particle(qreal X, qreal Y, qreal W, qreal H, QString type)
+Particle::Particle(qreal X, qreal Y, qreal W, qreal H, qreal F, QString type)
+    : w(W), h(H), friction(F)
 {
     res = 0.8;
-    w = W; h = H;
-    a = new PVector(0, .1);
-    v = new PVector(arc4random()%5 + 2, arc4random()%5 + 2);
+    a = new PVector(0, .4);
+    v = new PVector(QRandomGenerator::global()->bounded(4, 12), QRandomGenerator::global()->bounded(4, 12));
     p = new PVector(X, Y);
 
     pType = type;
 
     setFlag(ItemIsMovable);
     setFlag(ItemIsSelectable);
-    setFlag(ItemSendsScenePositionChanges);  // Necessary for detecting position changes
+    setFlag(ItemSendsScenePositionChanges);  // Necessary for detecting position
+    setCacheMode(DeviceCoordinateCache);
+    setAcceptedMouseButtons(Qt::LeftButton); // Ensure the item accepts left mouse button events
+
+    setPos(X, Y);
 }
 
-QRectF Particle::boundingRect() const
-{
-    return QRectF(p->x(), p->y(), w, h);
+QRectF Particle::boundingRect() const {
+    qreal penWidth = 1; // Adjust if your outline/stroke width is different
+    return QRectF(-w / 2 - penWidth / 2, -h / 2 - penWidth / 2, w + penWidth, h + penWidth);
 }
 
+void Particle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    QPen pen(QColor(0, 0, 0));
+    QRadialGradient grad(QPointF(-3, -3), 0.6 * w);  // Centered at the origin
 
-void Particle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    QPen pen (QColor(0,0,0));
-    QRadialGradient grad(QPointF(p->x() + w/2, p->y() + h/2), 0.6 * w);
-    grad.setColorAt(0.0, QColor(255,0,255));
-    grad.setColorAt(1.0, QColor(0,0,0));
+    grad.setColorAt(0.0, QColor(255, 0, 0));
+    grad.setColorAt(1.0, QColor(0, 0, 0));
 
     painter->setPen(pen);
     painter->setBrush(grad);
 
-    if (pType == "Ball" || pType == nullptr){
+    if (pType == "Ball" || pType.isNull()) {
         painter->drawEllipse(boundingRect());
-    }else if(pType == "Box"){
+    } else if (pType == "Box") {
         painter->drawRect(boundingRect());
-    }else {
+    } else {
         qDebug() << "invalid pType";
     }
 }
 
-void Particle::advance(int phase)
+QPainterPath Particle::shape() const
 {
-    if (!isDragging) {
-        *v+=*a;
-        *p+=*v;
-
-        QPointF location(mapToScene(p->components()));
-
-        if(location.x() >= scene()->width() - w){
-            p->setX(scene()->width() - w);
-            v->mult(-res,"x");
-        } else if (location.x() <= 0){
-            p->setX(0);
-            v->mult(-res,"x");
-        }
-
-        if(location.y() >= scene()->height() - h){
-            p->setY(scene()->height() - h);
-            v->mult(-res,"y");
-        } else if (location.y() <= 0){
-            p->setY(0);
-            v->mult(-res,"y");
-        }
+    QPainterPath path;
+    if (pType == "Ball" || pType.isNull()) {
+        path.addEllipse(boundingRect());
+    } else if (pType == "Box") {
+        path.addRect(boundingRect());
     }
+    return path;
+}
+
+void Particle::advance(int phase) {
+    if (!scene() || phase == 0) {
+        return;
+    }
+
+    updatePhysics();
+
+    prepareGeometryChange(); // Notify the scene about the geometry change
+    setPos(p->x(), p->y()); // Update the item's position
     update();
+}
+
+void Particle::updatePhysics(){
+
+    if (scene()->mouseGrabberItem() == this) {
+        QPointF sceneMousePos = mapFromScene(lastMousePosition); // Convert to local coordinates
+        a->setVector((lastMousePosition.x() - p->x()), (lastMousePosition.y() - p->y()));
+        a->mult(.03);
+        v->mult(.95);
+    }
+
+    *v += *a;
+    *p += *v;
+
+    if (p->x() >= scene()->width() - w / 2) {
+        p->setX(scene()->width() - w / 2);
+        v->mult(-res, "x");
+    } else if (p->x() <= w / 2) {
+        p->setX(w / 2);
+        v->mult(-res, "x");
+    }
+
+    if (p->y() >= scene()->height() - h / 2) {
+        p->setY(scene()->height() - h / 2);
+        v->mult(-res, "y");
+        if (v->y() < std::numeric_limits<qreal>::epsilon()) {
+            v->mult(friction);
+        }
+    } else if (p->y() <= h / 2) {
+        p->setY(h / 2);
+        v->mult(-res, "y");
+    }
 }
 
 void Particle::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    offset = event->pos();
-    isDragging = true;
+    lastMousePosition = event->scenePos(); // Use scene coordinates
 }
 
 void Particle::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->buttons() & Qt::LeftButton)
-    {
-        QPointF newPos = mapToParent(event->pos() - offset);
-        setPos(newPos);
+    if (event->buttons() & Qt::LeftButton) {
+        lastMousePosition = event->scenePos(); // Use scene coordinates
     }
 }
 
 void Particle::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    isDragging = false;
+    a->setVector(0, .4);
 }
+

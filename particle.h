@@ -14,21 +14,22 @@
 class Particle: public QGraphicsItem
 {
 public:
-    Particle(qreal X, qreal Y, qreal W, qreal H, QString type = nullptr);
-
+    Particle(qreal X, qreal Y, qreal W, qreal H, qreal F, QString type = nullptr);
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QPainterPath shape() const override;
 protected:
     void advance(int phase) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 private:
-    QPointF offset;
+    void updatePhysics();
+    QPointF lastMousePosition;
     PVector *p, *v, *a;
-    qreal w, h, m, res;
+    qreal w, h, m, res, friction;
     QString pType;
-    bool isDragging;
+    QPointF mouseOffset;
 };
 
 

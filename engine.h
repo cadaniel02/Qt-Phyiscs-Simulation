@@ -30,6 +30,5 @@ protected:
     void spawn(int num);
 protected slots:
     void refreshBg();
-
 };
 #endif // ENGINE_H
