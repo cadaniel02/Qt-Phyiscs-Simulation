@@ -18,6 +18,11 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     QPainterPath shape() const override;
+    qreal radius();
+    PVector position();
+    void move(const PVector& d);
+    void impulse(const PVector& d);
+    qreal speed();
 protected:
     void advance(int phase) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -29,7 +34,6 @@ private:
     PVector *p, *v, *a;
     qreal w, h, m, res, friction;
     QString pType;
-    QPointF mouseOffset;
 };
 
 

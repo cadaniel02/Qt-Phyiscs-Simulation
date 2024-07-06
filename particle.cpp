@@ -59,6 +59,35 @@ QPainterPath Particle::shape() const
     return path;
 }
 
+qreal Particle::radius()
+{
+    if (pType == "Ball" || pType.isNull()){
+        return w/2;
+    }
+    return 0;
+}
+
+PVector Particle::position()
+{
+    return *p;
+}
+
+void Particle::move(const PVector &d)
+{
+    p->setVector(p->x() + d.x(), p->y() + d.y());
+}
+
+void Particle::impulse(const PVector &d)
+{
+    qInfo() << d;
+    v->setVector(d.x(), d.y());
+ }
+
+qreal Particle::speed()
+{
+    return v->mag();
+}
+
 void Particle::advance(int phase) {
     if (!scene() || phase == 0) {
         return;

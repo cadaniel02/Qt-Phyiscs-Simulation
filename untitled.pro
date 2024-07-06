@@ -9,12 +9,14 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    collisions.cpp \
     engine.cpp \
     main.cpp \
     pVector.cpp \
     particle.cpp
 
 HEADERS += \
+    collisions.h \
     engine.h \
     pVector.h \
     particle.h

@@ -8,13 +8,26 @@ class PVector: public QVector2D
 {
 public:
     PVector(qreal x=0, qreal y=0);
+    PVector(QVector2D v);
+
     void setVector(qreal x, qreal y);
+    void setVector(QPointF p);
+
+    static PVector Zero();
 
     PVector& operator+=(const PVector& v1);
 
+    PVector& operator+=(const QPointF& p);
+
     PVector& operator-=(const PVector& v1);
 
-    void mult(qreal scalar, QString axis = nullptr);
+    PVector& operator-=(const QPointF& p);
+
+    PVector operator-() const;
+
+    PVector operator*(qreal scalar) const;
+
+    PVector mult(qreal scalar, QString axis = nullptr);
 
     qreal mag();
 

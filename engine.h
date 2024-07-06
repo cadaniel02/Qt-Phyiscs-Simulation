@@ -30,5 +30,6 @@ protected:
     void spawn(int num);
 protected slots:
     void refreshBg();
+    void checkCollisions();
 };
 #endif // ENGINE_H
