@@ -59,9 +59,6 @@ void Engine::checkCollisions()
     }
 }
 
-
-
-
 void Engine::refreshBg()
 {
     scene->setBackgroundBrush(QBrush(QColor(100,100,100)));
