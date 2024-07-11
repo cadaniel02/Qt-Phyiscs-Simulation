@@ -13,13 +13,17 @@ SOURCES += \
     engine.cpp \
     main.cpp \
     pVector.cpp \
-    particle.cpp
+    particle.cpp \
+    pmath.cpp \
+    rigidbody.cpp
 
 HEADERS += \
     collisions.h \
     engine.h \
     pVector.h \
-    particle.h
+    particle.h \
+    pmath.h \
+    rigidbody.h
 
 FORMS += \
     engine.ui

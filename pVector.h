@@ -1,38 +1,40 @@
 #ifndef PVECTOR_H
 #define PVECTOR_H
 
+#include <QObject>
 #include <QVector2D>
 #include <QtMath>
+#include <QString>
 
-class PVector: public QVector2D
-{
+namespace MyPhysics{
+
+class PVector {
 public:
-    PVector(qreal x=0, qreal y=0);
-    PVector(QVector2D v);
-
-    void setVector(qreal x, qreal y);
-    void setVector(QPointF p);
 
     static PVector Zero();
 
-    PVector& operator+=(const PVector& v1);
-
-    PVector& operator+=(const QPointF& p);
-
-    PVector& operator-=(const PVector& v1);
-
-    PVector& operator-=(const QPointF& p);
+    PVector(qreal x = 0, qreal y = 0);
 
     PVector operator-() const;
 
+    PVector operator-(const PVector& v) const;
+
+    PVector operator+(const PVector& v) const;
+
     PVector operator*(qreal scalar) const;
 
-    PVector mult(qreal scalar, QString axis = nullptr);
+    PVector operator/(qreal scalar) const;
 
-    qreal mag();
+    bool Equals(const PVector& other);
 
-    QPointF components();
+    qreal X() const;
+
+    qreal Y() const;
+
+private:
+    qreal x, y;
 
 };
 
+}
 #endif // PVECTOR_H

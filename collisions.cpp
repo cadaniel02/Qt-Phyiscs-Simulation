@@ -1,5 +1,8 @@
 #include "collisions.h"
 #include <QDebug>
+#include "pmath.h"
+
+namespace MyPhysics{
 
 Collisions::Collisions() {}
 
@@ -8,20 +11,18 @@ bool Collisions::intersectCircles(
     //return the normal vector and depth
     PVector &normal, qreal &depth)
 {
-    normal = PVector::Zero();
     depth = 0;
 
-    qreal distance = (center2 - center1).length();
+    qreal distance = PMath::distance(center1, center2);
     qreal radii = radius1+radius2;
 
     if (distance >= radii){
         return false;
     }
 
-    normal = PVector((center1 - center2).normalized());
+    normal = PMath::normalize(center1 - center2);
     depth = radii - distance;
-
-    qDebug() << "normal: " << normal << " depth: " << depth;
-
     return true;
+}
+
 }

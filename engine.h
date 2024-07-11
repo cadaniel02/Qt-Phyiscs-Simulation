@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 #include <QTimer>
 #include <QtMath>
-#include "particle.h"
+#include "rigidbody.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -25,7 +25,7 @@ private:
     Ui::Engine *ui;
     QGraphicsScene *scene;
     QTimer *timer;
-    QList <Particle*> particles;
+    QList <MyPhysics::RigidBody*> bodies;
 protected:
     void spawn(int num);
 protected slots:

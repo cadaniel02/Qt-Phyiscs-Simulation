@@ -14,7 +14,7 @@ Engine::Engine(QWidget *parent)
     scene->setSceneRect(bg);
     ui->graphicsView->setScene(scene);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
-    spawn(10);
+    spawn(4);
     timer = new QTimer();
     connect(timer, SIGNAL(timeout()), scene, SLOT(advance()));
     connect(timer, SIGNAL(timeout()), this, SLOT(refreshBg()));
@@ -34,9 +34,9 @@ void Engine::spawn(int num)
         qreal f=.99;
         qreal x = (rand()%798) + 25 - d;
         qreal y = (rand()%598) + 15 - d;
-        Particle *obj = new Particle(x,y,d,d,f);
-        particles << obj;
-        scene->addItem(particles.last());
+        MyPhysics::RigidBody *obj = new MyPhysics::RigidBody(x,y,d,d,f);
+        bodies << obj;
+        scene->addItem(bodies.last());
     }
 }
 
